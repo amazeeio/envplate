@@ -1,6 +1,9 @@
 # Build docker-gen from scratch
 FROM golang:1.16-alpine as ep-builder
 
+LABEL org.opencontainers.image.authors="tobybellwood" maintainer="tobybellwood"
+LABEL org.opencontainers.image.source="https://github.com/tobybellwood/envplate" repository="https://github.com/tobybellwood/envplate"
+
 ARG VERSION=main
 
 WORKDIR /build
