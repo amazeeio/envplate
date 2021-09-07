@@ -20,15 +20,91 @@ func (e Envmap) Export() {
 
 }
 
-// Import creates an Envmap from the actual environment.
-func Import() Envmap {
-	return ToMap(os.Environ())
+func (e Envmap) IsSet(key string) (ok bool) {
+
+	_, ok = e[key]
+
+	return
 }
 
-// Join builds a environment variable declaration out of seperate
-// key and value strings
-func Join(k, v string) string {
-	return strings.Join([]string{k, v}, separator)
+// Pop removes prefixes from all environment variable keys that match the
+// filter. Matching keys that have no prefixes anymore, get dropped.
+func (e Envmap) Pop(prefix string, filter Filter) Envmap {
+
+	var (
+		exp        = PrefixedKeysAll(prefix)
+		m   Envmap = make(map[string]string)
+	)
+
+	for k, v := range e {
+
+		var (
+			match = exp.FindStringSubmatch(k)
+			old   = match[1]
+			key   = match[2]
+		)
+
+		if filter(key) {
+
+			depth := len(old)
+
+			if depth > 0 {
+				m[k[1:len(k)]] = v
+			}
+
+		} else {
+			m[k] = v
+		}
+
+	}
+
+	return m
+
+}
+
+// Push prefixes all environment variable keys that match the filter
+// with the given prefix
+func (e Envmap) Push(prefix string, filter Filter) Envmap {
+
+	var (
+		exp        = PrefixedKeysAll(prefix)
+		m   Envmap = make(map[string]string)
+	)
+
+	for k, v := range e {
+
+		var (
+			match = exp.FindStringSubmatch(k)
+			key   = match[2]
+		)
+
+		if filter(key) {
+			m[prefix+k] = v
+		} else {
+			m[k] = v
+		}
+
+	}
+
+	return m
+
+}
+
+// Subset returns a subset of keys, denoted by the given Filter
+func (e Envmap) Subset(filter Filter) Envmap {
+
+	var m Envmap = make(map[string]string)
+
+	for k, v := range e {
+
+		if filter(k) {
+			m[k] = v
+		}
+
+	}
+
+	return m
+
 }
 
 // ToEnv converts a map of environment variables to a slice
@@ -41,6 +117,17 @@ func (e Envmap) ToEnv() (env []string) {
 
 	return
 
+}
+
+// Import creates an Envmap from the actual environment.
+func Import() Envmap {
+	return ToMap(os.Environ())
+}
+
+// Join builds a environment variable declaration out of seperate
+// key and value strings
+func Join(k, v string) string {
+	return strings.Join([]string{k, v}, separator)
 }
 
 // ToMap converts a slice of environment variables to a map

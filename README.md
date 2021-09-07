@@ -1,6 +1,10 @@
-# Envplate
+# Envplate - amazee.io fork
 
-[![Build Status](https://travis-ci.org/kreuzwerker/envplate.svg)](https://travis-ci.org/kreuzwerker/envplate)
+This version of Envplate has been forked from @ocean's update of the package to add a multi-arch Dockerfile build stage for ease of use.
+
+The original version is still available at https://github.com/kreuzwerker/envplate
+
+# Envplate
 
 Trivial templating for configuration files using environment keys. References to such keys are declared in arbitrary config files either as:
 
@@ -31,7 +35,7 @@ This can be used to use `ep` to parse configs and execute the container process 
 
 In case the file you want to modify already uses the pattern envplate is searching for ( e.g. for reading environment variables ) you can escape the sequence by adding a leading backslash `\`. It's also possible to escape a leading backslash by adding an additional backslash. Basically a sequence with an even number of leading backslashes will be parsed, is the number of leading backslashes odd the sequence will be escaped.
 
-See https://github.com/kreuzwerker/envplate#full-example
+See https://github.com/amazeeio/envplate#full-example
 
 ## Why?
 
@@ -40,7 +44,7 @@ For apps running Docker which rely (fully or partially) on configuration files i
 You can directly download envplate binaries into your Dockerfile using Github releases like this:
 
 ```
-RUN curl -sLo /usr/local/bin/ep https://github.com/kreuzwerker/envplate/releases/download/v0.0.8/ep-linux && chmod +x /usr/local/bin/ep
+RUN curl -sLo /usr/local/bin/ep https://github.com/amazeeio/envplate/releases/download/v0.0.8/ep-linux && chmod +x /usr/local/bin/ep
 
 ...
 

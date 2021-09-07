@@ -6,7 +6,7 @@ import (
 	"os"
 	"syscall"
 
-	"github.com/kreuzwerker/envplate"
+	"github.com/amazeeio/envplate"
 	"github.com/spf13/cobra"
 	"github.com/yawn/doubledash"
 )
