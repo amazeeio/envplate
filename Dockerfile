@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 # Build docker-gen from scratch
-FROM golang:1.23-alpine AS ep-builder
+FROM golang:1.25-alpine AS ep-builder
 
 ARG VERSION=v1.0.3
 
