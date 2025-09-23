@@ -1,10 +1,11 @@
 # syntax=docker/dockerfile:1
 # Build docker-gen from scratch
-FROM golang:1.23-alpine AS ep-builder
+FROM golang:1.25-alpine AS ep-builder
 
-ARG VERSION=v1.0.3
+ARG VERSION=v1.0.4-rc.1
 
-ADD https://github.com/kreuzwerker/envplate.git#${VERSION} /build
+# Pinning at https://github.com/kreuzwerker/envplate/commit/ec00ede3ca03c6bbbe0412bf4b84eacdcdabba11
+ADD https://github.com/kreuzwerker/envplate.git#ec00ede3ca03c6bbbe0412bf4b84eacdcdabba11 /build
 
 WORKDIR /build
 
