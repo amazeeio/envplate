@@ -14,7 +14,7 @@ RUN go mod download -json
 # Build the ep executable
 RUN CGO_ENABLED=0 go build -ldflags '-X main.buildVersion=${VERSION} -extldflags "-static"' -o ep ./bin/ep.go
 
-FROM alpine:3.22
+FROM alpine:3.23
 
 LABEL org.opencontainers.image.title="envplate" \
     org.opencontainers.image.description="A simple tool for managing environment variables" \
