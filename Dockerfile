@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 # Build ep from scratch
-FROM golang:1.25-alpine AS go-builder
+FROM golang:1.26-alpine AS go-builder
 
 ARG VERSION=v1.0.4-rc.1
 
