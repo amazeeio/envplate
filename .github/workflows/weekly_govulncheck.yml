@@ -1,0 +1,68 @@
+name: Weekly Go Vulnerability Check
+
+on:
+  schedule:
+    # Runs every Monday at 03:00 UTC.
+    - cron: "0 3 * * 1"
+  push:
+    branches:
+      - "main"
+      - "govulncheck"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  govulncheck:
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_REF: ghcr.io/amazeeio/envplate:latest
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+        with:
+          go-version: stable
+
+      - name: Install govulncheck
+        run: go install golang.org/x/vuln/cmd/govulncheck@latest
+
+      - name: Pull image
+        run: docker pull "$IMAGE_REF"
+
+      - name: Extract ep binary from image
+        run: |
+          CONTAINER_ID=$(docker create "$IMAGE_REF")
+          trap 'docker rm -f "$CONTAINER_ID" >/dev/null 2>&1 || true' EXIT
+          docker cp "$CONTAINER_ID":/usr/local/bin/ep ./ep
+          chmod +x ./ep
+
+      - name: Run govulncheck and capture output
+        id: run_govulncheck
+        shell: bash
+        run: |
+          set +e
+          govulncheck -mode binary ./ep | tee govulncheck.out
+          GOVULN_EXIT=${PIPESTATUS[0]}
+          echo "exit_code=${GOVULN_EXIT}" >> "$GITHUB_OUTPUT"
+
+      - name: Publish govulncheck summary
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "## govulncheck result"
+            echo
+            echo "Image: $IMAGE_REF"
+            echo "Exit code: ${{ steps.run_govulncheck.outputs.exit_code }}"
+            echo
+            echo '```text'
+            cat govulncheck.out
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Fail if vulnerabilities were found
+        if: ${{ steps.run_govulncheck.outputs.exit_code != '0' }}
+        run: |
+          echo "govulncheck reported vulnerabilities. See summary for details."
+          exit 1
